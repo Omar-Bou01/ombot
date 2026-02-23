@@ -1,6 +1,7 @@
 # OmBot
 
 Un chatbot intelligent construit avec Streamlit et OpenRouter API.
+lien : https://lz9zbh5prn9rejj7psips2.streamlit.app/
 
 ## Fonctionnalités
 
