@@ -175,17 +175,51 @@ st.markdown("""
             color: #64748b !important;
         }
         
-        /* ===== MESSAGES ===== */
+        /* ===== MESSAGES - Force proper layout ===== */
         [data-testid="stChatMessage"] {
             background: transparent !important;
             padding: 1rem 0 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+            width: 100% !important;
+        }
+
+        /* Avatar container - fixed size on the left */
+        [data-testid="stChatMessage"] > div:first-child {
+            flex-shrink: 0 !important;
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            min-width: 2.5rem !important;
+            margin-right: 0.5rem !important;
+            position: relative !important;
+        }
+
+        /* Content container - takes remaining space */
+        [data-testid="stChatMessage"] > div:last-child {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            max-width: calc(100% - 3.5rem) !important;
+            overflow-wrap: break-word !important;
+            word-break: break-word !important;
         }
         
+        /* Text inside messages */
         [data-testid="stChatMessage"] p {
             color: #f1f5f9 !important;
             font-size: 15px !important;
             line-height: 1.6 !important;
             text-align: left !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* Force avatar image to stay in bounds */
+        [data-testid="stChatMessage"] img {
+            max-width: 2.5rem !important;
+            max-height: 2.5rem !important;
+            border-radius: 50% !important;
         }
         
         /* ===== SCROLLBAR ===== */
@@ -256,6 +290,18 @@ def get_available_models():
 def generate_conversation_title(text):
     """Generate a title from the first user message"""
     return text[:30] + "..." if len(text) > 30 else text
+
+
+def get_api_key():
+    """Return API key from Streamlit secrets (deploy) or env vars (local)."""
+    try:
+        secret_key = st.secrets.get("OPENROUTER_API_KEY", "")
+        if secret_key:
+            return secret_key
+    except Exception:
+        pass
+
+    return os.getenv("OPENROUTER_API_KEY", "")
 
 # ============================================================================
 # SESSION STATE INITIALIZATION
@@ -403,17 +449,23 @@ if "pending_message" in st.session_state and st.session_state.pending_message:
     del st.session_state.pending_message
 
 if user_input:
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = get_api_key()
     
     if not api_key:
         st.error("""
         **API Key Not Configured**
         
         Please set up your OpenRouter API key:
+        
+        **For Streamlit Cloud deployment:**
+        1. Open app settings → **Secrets**
+        2. Add: `OPENROUTER_API_KEY="your_api_key"`
+        3. Save and restart the app
+        
+        **For local development:**
         1. Create a `.env` file in the project directory
         2. Add: `OPENROUTER_API_KEY=your_api_key`
-        3. Get a free API key from https://openrouter.ai
-        4. Restart the app
+        3. Restart the app
         """)
     else:
         # Add user message to conversation history
