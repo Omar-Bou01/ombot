@@ -303,6 +303,56 @@ def get_api_key():
 
     return os.getenv("OPENROUTER_API_KEY", "")
 
+
+def display_message(role, content):
+    """Display a chat message with custom HTML to prevent avatar overlap"""
+    if role == "user":
+        avatar_bg = "#ef4444"
+        avatar_text = "user"
+    else:
+        avatar_bg = "#f97316"
+        avatar_text = "art"
+    
+    html = f"""
+    <div style="
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 1rem;
+        margin: 1rem 0;
+        width: 100%;
+    ">
+        <div style="
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            background: {avatar_bg};
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 0.75rem;
+        ">
+            {avatar_text}
+        </div>
+        <div style="
+            flex: 1;
+            min-width: 0;
+            color: #f1f5f9;
+            font-size: 15px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        ">
+            {content}
+        </div>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
 # ============================================================================
 # SESSION STATE INITIALIZATION
 # ============================================================================
@@ -394,8 +444,7 @@ current_messages = current_conv["messages"]
 # Display messages
 if current_messages:
     for message in current_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        display_message(message["role"], message["content"])
 else:
     # Welcome screen - Clean and Professional
     st.markdown("# Bonjour")
@@ -479,8 +528,7 @@ if user_input:
             current_conv["title"] = generate_conversation_title(user_input)
         
         # Display user message in chat
-        with st.chat_message("user"):
-            st.markdown(user_input)
+        display_message("user", user_input)
         
         # Show loading spinner while waiting for response
         with st.spinner("Thinking..."):
@@ -516,8 +564,7 @@ if user_input:
                     })
                     
                     # Display assistant message in chat
-                    with st.chat_message("assistant"):
-                        st.markdown(assistant_message)
+                    display_message("assistant", assistant_message)
                     
                     # Rerun to update the sidebar
                     st.rerun()
