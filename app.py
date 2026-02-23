@@ -307,11 +307,11 @@ def get_api_key():
 def display_message(role, content):
     """Display a chat message with custom HTML to prevent avatar overlap"""
     if role == "user":
-        avatar_bg = "#ef4444"
-        avatar_text = "user"
+        avatar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+        avatar_icon = "👤"
     else:
-        avatar_bg = "#f97316"
-        avatar_text = "art"
+        avatar_bg = "linear-gradient(135deg, #00c896 0%, #0ea5e9 100%)"
+        avatar_icon = "🤖"
     
     html = f"""
     <div style="
@@ -328,15 +328,13 @@ def display_message(role, content):
             height: 2.5rem;
             min-width: 2.5rem;
             background: {avatar_bg};
-            border-radius: 0.375rem;
+            border-radius: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 500;
-            font-size: 0.75rem;
+            font-size: 1.2rem;
         ">
-            {avatar_text}
+            {avatar_icon}
         </div>
         <div style="
             flex: 1;
